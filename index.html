@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maras Restaurant - POS System</title>
+    <style>
+        :root {
+            --primary-glow: #e84393;
+            --secondary-glow: #ffb142;
+            --bg-dark: #0f1016;
+            --card-bg: #181925;
+            --text-color: #f5f6fa;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* شاشة تسجيل الدخول بتصميم جمالي */
+        #login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(rgba(15, 16, 22, 0.85), rgba(15, 16, 22, 0.95)), 
+                        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80') center/cover;
+        }
+
+        .login-box {
+            background: rgba(24, 25, 37, 0.95);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-banner {
+            width: 100%;
+            height: 120px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 1px solid var(--secondary-glow);
+        }
+
+        .login-box h2 {
+            color: var(--secondary-glow);
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #b2bec3;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #e84393, #d63031);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-login:hover {
+            opacity: 0.9;
+        }
+
+        /* واجهة النظام الرئيسي */
+        #pos-container {
+            display: none;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            color: var(--secondary-glow);
+            font-size: 1.4rem;
+        }
+
+        .category-title {
+            font-size: 1.15rem;
+            color: var(--secondary-glow);
+            margin: 20px 0 10px 0;
+            border-bottom: 2px solid rgba(255, 177, 66, 0.3);
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-glow);
+        }
+
+        .card img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 8px;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-price {
+            color: var(--secondary-glow);
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* لوحة التحكم الجانبية للنادل وإدارة الطاولات */
+        .sidebar {
+            width: 400px;
+            background: var(--card-bg);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            color: var(--secondary-glow);
+            margin-bottom: 12px;
+        }
+
+        .table-select-box {
+            margin-bottom: 15px;
+        }
+
+        .table-select-box label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            color: #b2bec3;
+        }
+
+        .table-select-box select {
+            width: 100%;
+            padding: 8px;
+            background: #222333;
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 6px;
+        }
+
+        /* أزرار إدارة الطاولات المحفوظة */
+        .tables-overview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .btn-table-view {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 6px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-table-view:hover, .btn-table-view.active {
+            background: var(--primary-glow);
+            border-color: var(--primary-glow);
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            margin-bottom: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .cart-item-controls button {
+            background: #e84393;
+            color: white;
+            border: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cart-summary {
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .cart-summary div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: #e84393;
+            color: white;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+        }
+
+        .restaurant-bio {
+            font-size: 0.75rem;
+            color: #8c7ae6;
+            margin-top: 10px;
+            line-height: 1.4;
+            background: rgba(140, 122, 230, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. شاشة تسجيل الدخول مع صورة جمالية للمطعم -->
+    <div id="login-container">
+        <div class="login-box">
+            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" alt="Maras Restaurant AI Art" class="login-banner">
+            <h2>MARAS RESTAURANT</h2>
+            <div class="input-group">
+                <label>اسم النادل / Waiter Name</label>
+                <input type="text" id="waiter-name" placeholder="أدخل اسمك (مثال: مروان)...">
+            </div>
+            <div class="input-group">
+                <label>كلمة المرور / Password</label>
+                <input type="password" id="waiter-pass" placeholder="أدخل الرمز السري...">
+            </div>
+            <button class="btn-login" onclick="loginWaiter()">دخول إلى النظام / Login</button>
+        </div>
+    </div>
+
+    <!-- 2. النظام الرئيسي -->
+    <div id="pos-container" style="display: none;">
+        <div class="main-content">
+            <header>
+                <h1>MARAS RESTAURANT - POS</h1>
+                <span id="logged-waiter-display" style="font-size: 0.9rem; color: #ffb142;"></span>
+            </header>
+
+            <!-- الأطباق الرئيسية -->
+            <h3 class="category-title">الأطباق الرئيسية / Main Dishes</h3>
+            <div class="grid-container">
+                <div class="card" onclick="addToCurrentOrder('Classic Sushi', 65)">
+                    <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=300&q=80" alt="Sushi">
+                    <div class="card-body"><div class="card-title">Classic Sushi</div><div class="card-price">65 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Salmon Sashimi', 85)">
+                    <img src="https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=300&q=80" alt="Sashimi">
+                    <div class="card-body"><div class="card-title">Salmon Sashimi</div><div class="card-price">85 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Shrimp Tempura', 70)">
+                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=300&q=80" alt="Tempura">
+                    <div class="card-body"><div class="card-title">Shrimp Tempura</div><div class="card-price">70 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Teriyaki Chicken', 60)">
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80" alt="Chicken">
+                    <div class="card-body"><div class="card-title">Teriyaki Chicken</div><div class="card-price">60 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Wagyu Steak', 150)">
+                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80" alt="Steak">
+                    <div class="card-body"><div class="card-title">Wagyu Steak</div><div class="card-price">150 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Lobster Tail', 130)">
+                    <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=300&q=80" alt="Lobster">
+                    <div class="card-body"><div class="card-title">Lobster Tail</div><div class="card-price">130 MAD</div></div>
+                </div>
+            </div>
+
+            <!-- السلطات -->
+            <h3 class="category-title">السلطات / Salads</h3>
+            <div class="grid-container">
+                <div class="card" onclick="addToCurrentOrder('Caesar Salad', 40)">
+                    <img src="https://images.unsplash.com/photo-1550304943-4f24f54ddde9?auto=format&fit=crop&w=300&q=80" alt="Caesar">
+                    <div class="card-body"><div class="card-title">Caesar Salad</div><div class="card-price">40 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Greek Salad', 35)">
+                    <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=300&q=80" alt="Greek">
+                    <div class="card-body"><div class="card-title">Greek Salad</div><div class="card-price">35 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Avocado Salad', 45)">
+                    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80" alt="Avocado">
+                    <div class="card-body"><div class="card-title">Avocado Salad</div><div class="card-price">45 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Seafood Salad', 60)">
+                    <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=300&q=80" alt="Seafood">
+                    <div class="card-body"><div class="card-title">Seafood Salad</div><div class="card-price">60 MAD</div></div>
+                </div>
+            </div>
+
+            <!-- أطباق الأطفال -->
+            <h3 class="category-title">أطباق الأطفال / Kids Menu</h3>
+            <div class="grid-container">
+                <div class="card" onclick="addToCurrentOrder('Kids Mini Burger', 30)">
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300&q=80" alt="Burger">
+                    <div class="card-body"><div class="card-title">Kids Mini Burger</div><div class="card-price">30 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Chicken Nuggets', 25)">
+                    <img src="https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=300&q=80" alt="Nuggets">
+                    <div class="card-body"><div class="card-title">Chicken Nuggets</div><div class="card-price">25 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Kids Pasta', 30)">
+                    <img src="https://images.unsplash.com/photo-1621996346565-e3d5d6281268?auto=format&fit=crop&w=300&q=80" alt="Pasta">
+                    <div class="card-body"><div class="card-title">Kids Pasta</div><div class="card-price">30 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Mini Pizza', 35)">
+                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=300&q=80" alt="Pizza">
+                    <div class="card-body"><div class="card-title">Mini Pizza</div><div class="card-price">35 MAD</div></div>
+                </div>
+            </div>
+
+            <!-- العصائر والمشروبات الباردة -->
+            <h3 class="category-title">العصائر والمشروبات / Juices & Drinks</h3>
+            <div class="grid-container">
+                <div class="card" onclick="addToCurrentOrder('Orange Juice', 25)">
+                    <img src="https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=300&q=80" alt="Orange">
+                    <div class="card-body"><div class="card-title">Orange Juice</div><div class="card-price">25 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Lemon Mint', 25)">
+                    <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=300&q=80" alt="Lemon">
+                    <div class="card-body"><div class="card-title">Lemon Mint</div><div class="card-price">25 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Avocado Shake', 35)">
+                    <img src="https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=300&q=80" alt="Avocado">
+                    <div class="card-body"><div class="card-title">Avocado Shake</div><div class="card-price">35 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Espresso Coffee', 18)">
+                    <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=300&q=80" alt="Coffee">
+                    <div class="card-body"><div class="card-title">Espresso Coffee</div><div class="card-price">18 MAD</div></div>
+                </div>
+            </div>
+
+            <!-- المشروبات الروحية/الكحولية -->
+            <h3 class="category-title">المشروبات الروحية / Alcoholic Drinks</h3>
+            <div class="grid-container">
+                <div class="card" onclick="addToCurrentOrder('Reserve Wine', 90)">
+                    <img src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=300&q=80" alt="Wine">
+                    <div class="card-body"><div class="card-title">Reserve Wine</div><div class="card-price">90 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Breeze Cocktail', 50)">
+                    <img src="https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=300&q=80" alt="Cocktail">
+                    <div class="card-body"><div class="card-title">Breeze Cocktail</div><div class="card-price">50 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Draft Beer', 45)">
+                    <img src="https://images.unsplash.com/photo-1608270118556-9195a806ecd8?auto=format&fit=crop&w=300&q=80" alt="Beer">
+                    <div class="card-body"><div class="card-title">Draft Beer</div><div class="card-price">45 MAD</div></div>
+                </div>
+                <div class="card" onclick="addToCurrentOrder('Premium Whisky', 110)">
+                    <img src="https://images.unsplash.com/photo-1527281400683-1aae777175f8?auto=format&fit=crop&w=300&q=80" alt="Whisky">
+                    <div class="card-body"><div class="card-title">Premium Whisky</div><div class="card-price">110 MAD</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- لوحة التحكم الجانبية لإدارة طاولات الزبائن (Reservation & Orders) -->
+        <div class="sidebar">
+            <h2>إدارة الطاولات / Tables Order</h2>
+            
+            <div class="table-select-box">
+                <label>اختر الطاولة للعمل عليها / Select Table</label>
+                <select id="table-num" onchange="switchTable()">
+                    <option value="1">الطاولة 01 - Table 1</option>
+                    <option value="2">الطاولة 02 - Table 2</option>
+                    <option value="3">الطاولة 03 - Table 3</option>
+                    <option value="4">الطاولة 04 - Table 4</option>
+                    <option value="VIP">طاولة VIP - VIP Table</option>
+                </select>
+            </div>
+
+            <div class="tables-overview">
+                <button class="btn-table-view" onclick="selectTableShortcut('1')">طاولة 1</button>
+                <button class="btn-table-view" onclick="selectTableShortcut('2')">طاولة 2</button>
+                <button class="btn-table-view" onclick="selectTableShortcut('3')">طاولة 3</button>
+                <button class="btn-table-view" onclick="selectTableShortcut('4')">طاولة 4</button>
+                <button class="btn-table-view" onclick="selectTableShortcut('VIP')" style="grid-column: span 2; background: #ffb142; color: #000; font-weight: bold;">طاولة VIP</button>
+            </div>
+
+            <div class="cart-items" id="cart-list">
+                <!-- أطباق الطاولة المختارة تظهر هنا -->
+            </div>
+
+            <div class="cart-summary">
+                <div><span>عدد العناصر (Items):</span> <strong id="total-qty">0</strong></div>
+                <div><span>المجموع الكلي (Total):</span> <strong id="total-amount">0</strong> MAD</div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-action btn-save" onclick="saveTableOrder()">حفظ الطلب / Save</button>
+                <button class="btn-action btn-print" onclick="printReceipt()">طباعة التذكرة</button>
+            </div>
+
+            <div class="restaurant-bio">
+                <strong>Maras Restaurant:</strong> High-class dining experience inspired by nature, elements, and pure culinary passion.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // تخزين طلبات كل طاولة بشكل مستقل (Reservation System per Table)
+        let tablesData = {
+            '1': [],
+            '2': [],
+            '3': [],
+            '4': [],
+            'VIP': []
+        };
+
+        let currentTable = '1';
+
+        function loginWaiter() {
+            let name = document.getElementById('waiter-name').value.trim();
+            let pass = document.getElementById('waiter-pass').value.trim();
+
+            if(name !== "") {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('pos-container').style.display = 'flex';
+                document.getElementById('logged-waiter-display').innerText = `النادل (Waiter): ${name}`;
+                updateCartUI();
+            } else {
+                alert("المرجو إدخال اسم النادل للتحقق / Please enter waiter name");
+            }
+        }
+
+        // تغيير الطاولة من القائمة المنسدلة
+        function switchTable() {
+            currentTable = document.getElementById('table-num').value;
+            updateCartUI();
+        }
+
+        // اختصار لاختيار الطاولة من الأزرار السريعة
+        function selectTableShortcut(tableId) {
+            currentTable = tableId;
+            document.getElementById('table-num').value = tableId;
+            updateCartUI();
+        }
+
+        // إضافة طبق للطاولة الحالية
+        function addToCurrentOrder(name, price) {
+            let cart = tablesData[currentTable];
+            let existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({ name: name, price: price, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        // تعديل الكمية داخل طاولة معينة
+        function changeQty(name, amount) {
+            let cart = tablesData[currentTable];
+            let item = cart.find(item => item.name === name);
+            if (item) {
+                item.qty += amount;
+                if (item.qty <= 0) {
+                    tablesData[currentTable] = cart.filter(i => i.name !== name);
+                }
+            }
+            updateCartUI();
+        }
+
+        // حفظ الطلب للطاولة الحالية
+        function saveTableOrder() {
+            alert(`تم حفظ طلبات الطاولة (${currentTable}) بنجاح! يمكنك الانتقال لطاولات أخرى والعودة لها متى شئت.`);
+        }
+
+        // تحديث واجهة السلة بناءً على الطاولة النشطة حالياً
+        function updateCartUI() {
+            let cart = tablesData[currentTable];
+            let cartList = document.getElementById('cart-list');
+            let totalQtyElem = document.getElementById('total-qty');
+            let totalAmountElem = document.getElementById('total-amount');
+
+            cartList.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartList.innerHTML = `<div style="color: #888; text-align: center; margin-top: 40px; font-size: 0.85rem;">
+                    الطاولة (${currentTable}) فارغة حالياً.<br>اضغط على الأطباق لإضافتها لحجز هذه الطاولة.
+                </div>`;
+                totalQtyElem.innerText = '0';
+                totalAmountElem.innerText = '0';
+                return;
+            }
+
+            let totalQty = 0;
+            let totalAmount = 0;
+
+            cart.forEach(item => {
+                totalQty += item.qty;
+                totalAmount += (item.price * item.qty);
+
+                let div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <span style="color: #ffb142; font-size: 0.8rem;">${item.price} MAD × ${item.qty}</span>
+                    </div>
+                    <div class="cart-item-controls">
+                        <button onclick="changeQty('${item.name}', -1)">-</button>
+                        <span style="margin: 0 5px;">${item.qty}</span>
+                        <button onclick="changeQty('${item.name}', 1)">+</button>
+                    </div>
+                `;
+                cartList.appendChild(div);
+            });
+
+            totalQtyElem.innerText = totalQty;
+            totalAmountElem.innerText = totalAmount;
+        }
+
+        // طباعة تذكرة الطاولة المحددة وتفريغها بعد الدفع
+        function printReceipt() {
+            let cart = tablesData[currentTable];
+            if (cart.length === 0) {
+                alert(`لا توجد طلبات مسجلة في الطاولة (${currentTable}) لطاعتها!`);
+                return;
+            }
+
+            let totalAmount = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            
+            alert(`=== تذكرة مطعم مارس (MARAS) ===\nرقم الطاولة: ${currentTable}\nالمجموع الكلي: ${totalAmount} MAD\nتمت طباعة التذكرة وإغلاق حساب الطاولة بنجاح!`);
+            
+            // تفريغ الطاولة بعد الدفع والطباعة
+            tablesData[currentTable] = [];
+            updateCartUI();
+        }
+    </script>
+</body>
+</html>
